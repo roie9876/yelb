@@ -1,0 +1,40 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yelb-ui
+  labels:
+    app: yelb-ui
+    tier: frontend
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+    # nodePort: 32777 <- if not specified, the system will generate a nodePort value
+  selector:
+    app: yelb-ui
+    tier: frontend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yelb-ui
+spec:
+  selector:
+    matchLabels:
+      app: yelb-ui
+      tier: frontend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: yelb-ui
+        tier: frontend
+    spec:
+      containers:
+      - name: yelb-ui
+        image: vmware/restreview-ui:V1
+        ports:
+        - containerPort: 80

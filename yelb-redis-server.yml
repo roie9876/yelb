@@ -1,0 +1,45 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-server
+  labels:
+    app: redis-server
+    tier: cache
+spec:
+  type: ClusterIP
+  ports:
+  - port: 6379
+  selector:
+    app: redis-server
+    tier: cache
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-server
+      tier: cache
+  template:
+    metadata:
+      labels:
+        app: redis-server
+        tier: cache
+    spec:
+      containers:
+      - name: redis-server
+        image: vmware/restreview-redis:V1
+        ports:
+        - containerPort: 6379
+        volumeMounts:
+        - name: redis-slave-data
+          mountPath: /data
+      volumes:
+      - name: redis-slave-data
+        persistentVolumeClaim:
+          claimName: redis-slave-claim
